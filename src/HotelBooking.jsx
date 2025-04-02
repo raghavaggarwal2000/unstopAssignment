@@ -5,38 +5,53 @@ import { findOptimalRooms, generateInitialRooms } from "./util/helper";
 const HotelBooking = () => {
   const [rooms, setRooms] = useState({});
   const [numRooms, setNumRooms] = useState(1);
+  const [totalAvailability, setTotalAvailability] = useState([]);
 
-  useEffect(() => {
-    resetBooking();
-  }, []);
+    useEffect(() => {
+      resetBooking();
+    }, []);
+
     const bookRooms = () => {
     if(numRooms > MAX_BOOKING_ALLOWED){
       alert("A guest can register 5 rooms only.")
     }
     let updatedRooms = { ...rooms };
-    let selectedRooms = findOptimalRooms(updatedRooms, numRooms);
+    let updatedAvailability = [...totalAvailability];
+    let selectedRooms = findOptimalRooms(updatedRooms, numRooms, totalAvailability, setTotalAvailability);
 
     if (selectedRooms.length < numRooms) {
-      alert("Not enough available rooms!");
+      alert(`Not enough available rooms!`);
       return;
     }
 
     selectedRooms.forEach(({ floor, index }) => {
       updatedRooms[floor][index] = true;
+      updatedAvailability[floor - 1] -= 1;
     });
     setRooms(updatedRooms);
+    setTotalAvailability(updatedAvailability);
   };
 
-  const randomizeOccupancy = () => {
-    let updatedRooms = generateInitialRooms();
-    for (let floor in updatedRooms) {
-      updatedRooms[floor] = updatedRooms[floor].map(() => Math.random() > 0.7);
-    }
-    setRooms(updatedRooms);
-  };
+const randomizeOccupancy = () => {
+  const { rooms: updatedRooms } = generateInitialRooms();
+
+  Object.keys(updatedRooms).forEach((floor) => {
+    updatedRooms[floor] = updatedRooms[floor].map(() => Math.random() > 0.7);
+  });
+
+  const updatedAvailability = Object.keys(updatedRooms).map(
+    (floor) => updatedRooms[floor].filter((room) => !room).length
+  );
+
+  setRooms(updatedRooms);
+  setTotalAvailability(updatedAvailability);
+};
+
 
   const resetBooking = () => {
-    setRooms(generateInitialRooms());
+    const {rooms, availability} = generateInitialRooms()
+    setRooms(rooms);
+    setTotalAvailability(availability);
   };
 
   const IsBookingAllowed = numRooms <= MAX_BOOKING_ALLOWED;
@@ -51,7 +66,7 @@ const HotelBooking = () => {
             className="input"
             value={numRooms}
             max={MAX_BOOKING_ALLOWED}
-            onChange={(e) => setNumRooms(e.target.value)}
+            onChange={(e) => setNumRooms(Number(e.target.value))}
             style={{width: "90%"}}
           />
           {!IsBookingAllowed && <small>Rooms should be less than 6</small>}
