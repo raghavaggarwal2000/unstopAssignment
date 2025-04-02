@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FLOORS, MAX_BOOKING_ALLOWED } from "./constants";
-import { generateInitialRooms } from "./util/helper";
-
-
+import { MAX_BOOKING_ALLOWED } from "./constants";
+import { findOptimalRooms, generateInitialRooms } from "./util/helper";
 
 const HotelBooking = () => {
   const [rooms, setRooms] = useState({});
@@ -11,7 +9,23 @@ const HotelBooking = () => {
   useEffect(() => {
     resetBooking();
   }, []);
-  
+    const bookRooms = () => {
+    if(numRooms > MAX_BOOKING_ALLOWED){
+      alert("A guest can register 5 rooms only.")
+    }
+    let updatedRooms = { ...rooms };
+    let selectedRooms = findOptimalRooms(updatedRooms, numRooms);
+
+    if (selectedRooms.length < numRooms) {
+      alert("Not enough available rooms!");
+      return;
+    }
+
+    selectedRooms.forEach(({ floor, index }) => {
+      updatedRooms[floor][index] = true;
+    });
+    setRooms(updatedRooms);
+  };
 
   const randomizeOccupancy = () => {
     let updatedRooms = generateInitialRooms();
@@ -45,6 +59,7 @@ const HotelBooking = () => {
         </div>
         <button 
           className={`button book ${!IsBookingAllowed && 'cursor-disabled'}`} 
+          onClick={bookRooms}
           disabled={!IsBookingAllowed}
         >
           Book Rooms
