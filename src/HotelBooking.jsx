@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FLOORS } from "./constants";
+import { FLOORS, MAX_BOOKING_ALLOWED } from "./constants";
 import { generateInitialRooms } from "./util/helper";
 
 
@@ -25,16 +25,30 @@ const HotelBooking = () => {
     setRooms(generateInitialRooms());
   };
 
+  const IsBookingAllowed = numRooms <= MAX_BOOKING_ALLOWED;
+
   return (
     <div className="container">
       <h1 className="title">Hotel Room Reservation System</h1>
       <div className="controls">
-        <input
-          type="number"
-          className="input"
-          value={numRooms}
-          onChange={(e) => setNumRooms(e.target.value)}
-        />
+        <div className="input-container">
+          <input
+            type="number"
+            className="input"
+            value={numRooms}
+            max={MAX_BOOKING_ALLOWED}
+            onChange={(e) => setNumRooms(e.target.value)}
+            style={{width: "90%"}}
+          />
+          {!IsBookingAllowed && <small>Rooms should be less than 6</small>}
+
+        </div>
+        <button 
+          className={`button book ${!IsBookingAllowed && 'cursor-disabled'}`} 
+          disabled={!IsBookingAllowed}
+        >
+          Book Rooms
+        </button>
         <button className="button random" onClick={randomizeOccupancy}>
           Randomize
         </button>
@@ -42,7 +56,6 @@ const HotelBooking = () => {
           Reset
         </button>
       </div>
-      {/* <div className="travel-time">Total Travel Time: {travelTime} minutes</div> */}
       <div className="grid">
         {Object.entries(rooms)
           .reverse()

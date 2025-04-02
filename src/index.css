@@ -83,3 +83,13 @@
   background-color: #f44336;
   color: white;
 }
+
+.input-container{
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cursor-disabled{
+  cursor: not-allowed;
+}
