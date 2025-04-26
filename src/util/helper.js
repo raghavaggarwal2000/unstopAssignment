@@ -3,7 +3,7 @@ import { FLOORS, LAST_FLOOR_ROOMS, ROOMS_PER_FLOOR } from "../constants";
 const generateInitialRooms = () => {
   let rooms = {};
   let availability = [];
-  for (let floor = 1; floor <= FLOORS; floor++) {
+  for (let floor = 10; floor > 0; floor--) {
     let numRooms = floor === 10 ? LAST_FLOOR_ROOMS : ROOMS_PER_FLOOR;
     rooms[floor] = Array(numRooms).fill(false); // false means available
     availability.push(numRooms);
@@ -15,29 +15,29 @@ const findOptimalRooms = (rooms, numRooms, availability) => {
   let selectedRooms = [];
 
   // Checking if booking on same floor is available amd adjacent to each other
-  for (let floor = 1; floor <= FLOORS; floor++) {
-    let availableIndexes = rooms[floor]
-      .map((occupied, index) => (!occupied ? index : null))
-      .filter((index) => index !== null);
+  // for (let floor = 10; floor > 0; floor--) {
+  //   let availableIndexes = rooms[floor]
+  //     .map((occupied, index) => (!occupied ? index : null))
+  //     .filter((index) => index !== null);
 
-    for (let i = 0; i <= availableIndexes.length - numRooms; i++) {
-      let isAdjacent = true;
-      for (let j = 1; j < numRooms; j++) {
-        if (availableIndexes[i + j] !== availableIndexes[i] + j) {
-          isAdjacent = false;
-          break;
-        }
-      }
-      if (isAdjacent) {
-        return availableIndexes
-          .slice(i, i + numRooms)
-          .map((index) => ({ floor, index }));
-      }
-    }
-  }
+  //   for (let i = 0; i <= availableIndexes.length - numRooms; i++) {
+  //     let isAdjacent = true;
+  //     for (let j = 1; j < numRooms; j++) {
+  //       if (availableIndexes[i + j] !== availableIndexes[i] + j) {
+  //         isAdjacent = false;
+  //         break;
+  //       }
+  //     }
+  //     if (isAdjacent) {
+  //       return availableIndexes
+  //         .slice(i, i + numRooms)
+  //         .map((index) => ({ floor, index }));
+  //     }
+  //   }
+  // }
 
   // Same floor but not adjacent to each other
-  for (let floor = 1; floor <= FLOORS; floor++) {
+  for (let floor = 10; floor > 0; floor--) {
     let availableIndexes = rooms[floor]
       .map((occupied, index) => (!occupied ? index : null))
       .filter((index) => index !== null);
@@ -50,7 +50,7 @@ const findOptimalRooms = (rooms, numRooms, availability) => {
   }
 
   // Adjacent rooms across multiple floors
-  for (let floor = 1; floor < FLOORS; floor++) {
+  for (let floor = 10; floor < FLOORS; floor--) {
     if (availability[floor - 1] > 0 && availability[floor] > 0) {
       let floor1Indexes = rooms[floor]
         .map((occupied, index) => (!occupied ? index : null))
@@ -69,7 +69,7 @@ const findOptimalRooms = (rooms, numRooms, availability) => {
   }
 
   // Different floor
-  for (let floor = 1; floor <= FLOORS; floor++) {
+  for (let floor = 10; floor > 0; floor--) {
     for (let index = 0; index < rooms[floor].length; index++) {
       if (!rooms[floor][index]) {
         selectedRooms.push({ floor, index });
